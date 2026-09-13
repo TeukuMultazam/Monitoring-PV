@@ -3,52 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart PV Monitoring</title>
-    <!-- Font & Ikon -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Smart PV Cooling</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Bootstrap -->
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #f4f7f6; }
-        
-        /* Halaman Login */
-        #login-screen {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        :root {
+            --font-display: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --bg-main: #f8fafc; 
+            --sidebar-bg: #0f172a; 
+            --sidebar-text: #94a3b8;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --card-border: rgba(226, 232, 240, 0.8);
         }
-        .login-card {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 400px;
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-main); 
+            color: var(--text-primary); 
+            overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased;
         }
+        h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.02em; }
 
-        /* Dashboard */
+        /* Layout */
+        #wrapper { display: flex; width: 100%; min-height: 100vh; }
+        
+        /* Sidebar Desktop */
+        #sidebar { 
+            width: 270px; background-color: var(--sidebar-bg); color: #ffffff; 
+            min-height: 100vh; position: fixed; display: flex; flex-direction: column; 
+            z-index: 100; box-shadow: 4px 0 24px rgba(0,0,0,0.04); transition: all 0.3s ease;
+        }
+        .sidebar-brand { 
+            padding: 35px 24px 25px; font-weight: 800; font-size: 1.15rem; 
+            letter-spacing: 0.5px; text-align: center; color: #ffffff; border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .sidebar-brand i { color: #38bdf8; margin-right: 8px; }
+        
+        .nav-list { padding: 20px 16px; list-style: none; margin: 0; }
+        .nav-item { margin-bottom: 6px; }
+        .nav-link { 
+            color: var(--sidebar-text); text-decoration: none; display: flex; align-items: center; 
+            gap: 14px; padding: 14px 18px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; 
+            transition: all 0.3s ease; cursor: pointer;
+        }
+        .nav-link:hover { color: #ffffff; background-color: rgba(255,255,255,0.03); }
+        .nav-link.active { 
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; 
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
+        }
+        
+        /* Box Waktu Sidebar */
+        .info-box {
+            margin-top: auto; padding: 20px; background-color: rgba(255,255,255,0.03); 
+            margin: 20px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);
+        }
+        .info-time-val { font-weight: 700; color: #ffffff; font-variant-numeric: tabular-nums; font-size: 0.95rem; }
+
+        /* Main Content Desktop */
+        #page-content { flex: 1; margin-left: 270px; padding: 40px 50px; width: calc(100% - 270px); }
+        
         .card-custom {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s;
+            background: #ffffff; border: 1px solid var(--card-border); border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02); margin-bottom: 24px; padding: 26px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .card-custom:hover { transform: translateY(-5px); }
-        .icon-box {
-            width: 50px; height: 50px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; color: white;
+        .card-custom:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04); }
+        
+        /* DASHBOARD METRICS */
+        .metric-header { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; }
+        .metric-title { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px; }
+        .metric-icon-box { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .metric-value { font-family: var(--font-display); font-size: 2.4rem; font-weight: 800; line-height: 1; color: var(--text-primary); letter-spacing: -0.03em;}
+        .metric-unit { font-size: 1rem; color: var(--text-muted); font-weight: 600; margin-left: 4px; }
+        
+        .detail-item { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid #f1f5f9; }
+        .detail-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .detail-name { color: var(--text-muted); font-weight: 600; font-size: 0.95rem; }
+        .detail-val { font-weight: 800; font-variant-numeric: tabular-nums; font-size: 1.05rem; }
+
+        .control-container { max-width: 650px; margin: 0 auto; background: white; border-radius: 20px; padding: 45px; box-shadow: 0 15px 40px rgba(0,0,0,0.03); text-align: center; border: 1px solid var(--card-border); }
+        .robot-icon { font-size: 4.5rem; color: #10b981; margin-bottom: 20px; }
+        .control-title { font-weight: 800; font-size: 2rem; color: #0f172a; margin-bottom: 12px; }
+        .control-desc { color: #64748b; font-size: 1.05rem; margin-bottom: 35px; line-height: 1.6; }
+        
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #f1f5f9; }
+        .setting-label { font-weight: 600; color: #64748b; display: flex; align-items: center; gap: 12px; font-size: 1.05rem; }
+        .setting-value { font-weight: 700; color: #0f172a; font-size: 1.05rem; }
+        
+        .btn-action-trigger { 
+            padding: 18px 45px; border-radius: 12px; font-weight: 800; font-size: 1.15rem; 
+            display: flex; align-items: center; gap: 12px; border: none; transition: all 0.3s ease;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3); width: 100%; justify-content: center; letter-spacing: 0.5px;
         }
-        .navbar-custom {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        
+        .chart-wrapper { position: relative; height: 40vh; width: 100%; margin-top: 10px; }
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        
+        @media (max-width: 991px) {
+            #sidebar { width: 100%; min-height: auto; position: relative; box-shadow: none; }
+            #wrapper { flex-direction: column; }
+            #page-content { margin-left: 0; width: 100%; padding: 16px; }
+            .nav-list { display: flex; overflow-x: auto; padding: 10px 12px; gap: 8px; white-space: nowrap; }
+            .nav-item { margin-bottom: 0; flex-shrink: 0; }
+            .info-box { display: none; }
+            .metric-value { font-size: 2rem; }
+            .setting-row { flex-direction: column; align-items: flex-start; gap: 5px; }
         }
     </style>
 </head>
@@ -56,119 +126,192 @@
 
     <!-- HALAMAN LOGIN -->
     <div id="login-screen">
-        <div class="login-card text-center">
-            <h3 class="fw-bold mb-4">PV Monitoring</h3>
-            <p class="text-muted mb-4">Silakan masuk dengan akun Anda</p>
-            <div class="form-floating mb-3">
-                <input type="email" class="form-control" id="email" placeholder="name@example.com">
-                <label for="email">Alamat Email</label>
+        <div class="card p-4 p-md-5 border-0 login-card" style="width: 100%; max-width: 420px; border-radius: 24px;">
+            <div class="text-center mb-4">
+                <i class="fa-solid fa-solar-panel fs-1 text-primary mb-3"></i>
+                <h3 class="fw-bold text-dark m-0">SMART PV COOLING</h3>
             </div>
-            <div class="form-floating mb-4">
-                <input type="password" class="form-control" id="password" placeholder="Password">
-                <label for="password">Kata Sandi</label>
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Email Pengguna</label>
+                <input type="email" id="email" class="form-control form-control-lg bg-light" style="border-radius: 10px;">
             </div>
-            <button id="btnLogin" class="btn btn-primary w-100 py-2 fw-bold" style="border-radius: 10px;">MASUK</button>
-            <p id="pesanError" class="text-danger mt-3" style="display:none;"></p>
+            <div class="mb-4">
+                <label class="form-label small fw-bold text-muted">Kata Sandi</label>
+                <input type="password" id="password" class="form-control form-control-lg bg-light" style="border-radius: 10px;">
+            </div>
+            <button id="btnLogin" class="btn btn-primary btn-lg w-100 fw-bold" style="border-radius: 10px; padding: 14px;">Masuk</button>
+            <div id="pesanError" class="text-danger mt-3 text-center small fw-bold" style="display:none;"></div>
         </div>
     </div>
 
-    <!-- HALAMAN DASHBOARD (Awalnya Disembunyikan) -->
-    <div id="dashboard-screen" style="display: none;">
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-custom mb-4 py-3">
-            <div class="container">
-                <a class="navbar-brand fw-bold" href="#"><i class="fa-solid fa-solar-panel text-primary me-2"></i> Smart PV Dashboard</a>
-                <button id="btnLogout" class="btn btn-outline-danger btn-sm fw-bold"><i class="fa-solid fa-right-from-bracket me-1"></i> Keluar</button>
+    <!-- MAIN APP STRUCTURE -->
+    <div id="wrapper" style="display: none;">
+        
+        <!-- SIDEBAR -->
+        <div id="sidebar">
+            <div class="sidebar-brand"><i class="fa-solid fa-solar-panel"></i> SMART PV COOLING</div>
+            
+            <ul class="nav-list">
+                <li class="nav-item"><a class="nav-link active" data-target="dashboard"><i class="fa-solid fa-desktop"></i> Data Utama</a></li>
+                <li class="nav-item"><a class="nav-link" data-target="grafik"><i class="fa-solid fa-chart-line"></i> Grafik Riwayat</a></li>
+                <li class="nav-item"><a class="nav-link" data-target="kontrol"><i class="fa-solid fa-cogs"></i> Sistem Kendali</a></li>
+            </ul>
+            
+            <div class="info-box">
+                <div class="text-white-50 small fw-bold mb-3 text-uppercase" style="letter-spacing: 1px; font-size: 0.75rem;">Waktu Sistem (RTC)</div>
+                <div class="d-flex align-items-center justify-content-between mb-2 text-white-50">
+                    <span><i class="fa-regular fa-calendar me-2"></i>Tgl</span>
+                    <span id="tanggal" class="info-time-val">--/--/----</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mb-4 text-white-50">
+                    <span><i class="fa-regular fa-clock me-2"></i>Jam</span>
+                    <span id="jam" class="info-time-val">--:--:--</span>
+                </div>
+                <button id="btnLogout" class="btn btn-outline-light w-100 fw-bold btn-sm" style="border-radius: 8px; padding: 8px;"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</button>
             </div>
-        </nav>
+        </div>
 
-        <div class="container">
-            <!-- Kartu Statistik -->
-            <div class="row mb-4">
-                <div class="col-md-3 mb-3">
-                    <div class="card card-custom p-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <p class="text-muted mb-1 fs-6">Suhu Panel</p>
-                                <h3 class="fw-bold mb-0" id="suhu">0.0 °C</h3>
-                            </div>
-                            <div class="icon-box" style="background: linear-gradient(135deg, #ff416c, #ff4b2b);"><i class="fa-solid fa-temperature-high"></i></div>
-                        </div>
-                    </div>
+        <!-- PAGE CONTENT -->
+        <div id="page-content">
+            
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div>
+                    <h2 class="fw-bold m-0 text-dark fs-4 fs-md-3" id="halaman-judul">Data Monitoring Saat Ini</h2>
+                    <p class="text-muted mt-1 mb-0 small">Sistem Pemantauan Performa & Pendingin Panel Surya</p>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card card-custom p-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <p class="text-muted mb-1 fs-6">Efisiensi</p>
-                                <h3 class="fw-bold mb-0" id="efisiensi">0.0 %</h3>
-                            </div>
-                            <div class="icon-box" style="background: linear-gradient(135deg, #11998e, #38ef7d);"><i class="fa-solid fa-percent"></i></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card card-custom p-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <p class="text-muted mb-1 fs-6">Daya Keluar</p>
-                                <h3 class="fw-bold mb-0" id="daya">0.0 W</h3>
-                            </div>
-                            <div class="icon-box" style="background: linear-gradient(135deg, #36D1DC, #5B86E5);"><i class="fa-solid fa-bolt"></i></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card card-custom p-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <p class="text-muted mb-1 fs-6">Status Pompa</p>
-                                <h4 class="fw-bold mb-0" id="pompa">-</h4>
-                            </div>
-                            <div class="icon-box bg-dark"><i class="fa-solid fa-power-off"></i></div>
-                        </div>
-                    </div>
-                </div>
+                <button id="btnExcel" class="btn btn-primary fw-bold px-3 py-2 w-100 w-md-auto" style="border-radius: 10px; background: #0f172a; border: none; box-shadow: 0 4px 10px rgba(15,23,42,0.2);">
+                    <i class="fa-solid fa-file-excel me-2"></i> Unduh Laporan (.csv)
+                </button>
             </div>
 
-            <!-- Detail Kelistrikan (Tegangan & Arus & Lux) -->
-            <div class="row mb-4 text-center">
-                <div class="col-md-4">
-                    <div class="card card-custom p-2"><strong class="text-muted">Cahaya Matahari:</strong> <span id="lux" class="fs-5 fw-bold">0 Lux</span></div>
+            <!-- SECTION 1: DASHBOARD UTAMA -->
+            <div id="section-dashboard" class="content-section">
+                <div class="row g-3 mb-4">
+                    <div class="col-xl-3 col-md-6 col-12">
+                        <div class="card-custom">
+                            <div class="metric-header">
+                                <span class="metric-title">DAYA MASUK (PIN)</span>
+                                <div class="metric-icon-box" style="background: #fef3c7; color: #d97706;"><i class="fa-solid fa-sun"></i></div>
+                            </div>
+                            <div class="metric-value"><span id="dayaMasuk">0.00</span><span class="metric-unit">W</span></div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 col-12">
+                        <div class="card-custom">
+                            <div class="metric-header">
+                                <span class="metric-title">DAYA KELUAR (POUT)</span>
+                                <div class="metric-icon-box" style="background: #dbeafe; color: #2563eb;"><i class="fa-solid fa-bolt"></i></div>
+                            </div>
+                            <div class="metric-value"><span id="dayaKeluar">0.00</span><span class="metric-unit">W</span></div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 col-12">
+                        <div class="card-custom">
+                            <div class="metric-header">
+                                <span class="metric-title">SUHU PANEL</span>
+                                <div class="metric-icon-box" style="background: #ffe4e6; color: #e11d48;"><i class="fa-solid fa-temperature-half"></i></div>
+                            </div>
+                            <div class="metric-value"><span id="suhu">0.0</span><span class="metric-unit">°C</span></div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 col-12">
+                        <div class="card-custom">
+                            <div class="metric-header">
+                                <span class="metric-title">EFISIENSI PV</span>
+                                <div class="metric-icon-box" style="background: #d1fae5; color: #059669;"><i class="fa-solid fa-percent"></i></div>
+                            </div>
+                            <div class="metric-value"><span id="efisiensi">0.0</span><span class="metric-unit">%</span></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card card-custom p-2"><strong class="text-muted">Tegangan (V):</strong> <span id="tegangan" class="fs-5 fw-bold">0.00 V</span></div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card card-custom p-2"><strong class="text-muted">Arus (I):</strong> <span id="arus" class="fs-5 fw-bold">0 mA</span></div>
+
+                <div class="row g-3">
+                    <div class="col-lg-6 col-12">
+                        <div class="card-custom h-100">
+                            <h5 class="fw-bold mb-3 d-flex align-items-center fs-6" style="color: #2563eb;"><i class="fa-solid fa-bolt-lightning me-2"></i> Parameter Elektrikal Output</h5>
+                            <div class="detail-item"><span class="detail-name">Tegangan Operasi (V)</span><span class="detail-val"><span id="tegangan">0.00</span> V</span></div>
+                            <div class="detail-item"><span class="detail-name">Arus Operasi (I)</span><span class="detail-val"><span id="arus">0</span> mA</span></div>
+                            <div class="detail-item"><span class="detail-name">Daya Listrik Aktual</span><span class="detail-val text-primary"><span id="dayaKeluar2">0.00</span> W</span></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-12">
+                        <div class="card-custom h-100">
+                            <h5 class="fw-bold mb-3 d-flex align-items-center fs-6" style="color: #d97706;"><i class="fa-solid fa-cloud-sun me-2"></i> Parameter Lingkungan & Aktuator</h5>
+                            <div class="detail-item"><span class="detail-name">Intensitas Radiasi (Lux)</span><span class="detail-val"><span id="lux">0</span> lx</span></div>
+                            <div class="detail-item"><span class="detail-name">Suhu Permukaan PV</span><span class="detail-val text-danger"><span id="suhu2">0.0</span> °C</span></div>
+                            <div class="detail-item"><span class="detail-name">Status Pompa Sprayer</span><span class="detail-val" id="statusPompa">-</span></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Grafik Chart.js -->
-            <div class="row">
-                <div class="col-md-6 mb-4">
-                    <div class="card card-custom p-3">
-                        <h5 class="fw-bold mb-3 text-center">Tren Suhu (°C)</h5>
-                        <canvas id="grafikSuhu"></canvas>
+            <!-- SECTION 2: GRAFIK -->
+            <div id="section-grafik" class="content-section" style="display: none;">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="card-custom pb-3">
+                            <h6 class="fw-bold mb-1 text-dark">Suhu (°C)</h6>
+                            <p class="text-muted small mb-3">Pemantauan suhu permukaan panel secara real-time</p>
+                            <div class="chart-wrapper">
+                                <canvas id="grafikSuhu"></canvas>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="card card-custom p-3">
-                        <h5 class="fw-bold mb-3 text-center">Tren Efisiensi (%)</h5>
-                        <canvas id="grafikEfisiensi"></canvas>
+                    <div class="col-12">
+                        <div class="card-custom pb-3">
+                            <h6 class="fw-bold mb-1 text-dark">Efisiensi (%)</h6>
+                            <p class="text-muted small mb-3">Performa konversi daya panel secara real-time</p>
+                            <div class="chart-wrapper">
+                                <canvas id="grafikEfisiensi"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- SECTION 3: KONTROL -->
+            <div id="section-kontrol" class="content-section" style="display: none;">
+                <div class="control-container p-3 p-md-5">
+                    <div class="mb-3 d-inline-block p-3 rounded-circle" style="background: #ecfdf5;">
+                        <i class="fa-solid fa-robot robot-icon m-0" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h3 class="control-title fs-4">Sistem Siap (Otomatis)</h3>
+                    <p class="control-desc small mb-4">Sistem memantau suhu 24 jam. Menyemprotkan air selama 5 detik lalu jeda mendingin selama 2 menit jika suhu mencapai batas.</p>
+                    
+                    <div class="setting-row">
+                        <div class="setting-label small"><i class="fa-solid fa-temperature-arrow-up"></i> Syarat Otomatis Aktif</div>
+                        <div class="setting-value text-dark small">Suhu &ge; <span class="text-danger fw-bold">45.0 °C</span></div>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label small"><i class="fa-solid fa-droplet"></i> Durasi Penyemprotan</div>
+                        <div class="setting-value small">5 Detik</div>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label small"><i class="fa-solid fa-stopwatch"></i> Jeda Mendingin</div>
+                        <div class="setting-value small">2 Menit</div>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label small"><i class="fa-solid fa-circle-info"></i> Status Mesin Aktual</div>
+                        <div class="setting-value small" id="labelStatusMesin"><span class="text-secondary">Memuat...</span></div>
+                    </div>
+
+                    <div class="action-buttons-wrapper mt-3">
+                        <button id="btnTriggerSemprot" class="btn-action-trigger fs-6 py-3">
+                            <i class="fa-solid fa-shower me-2"></i> SEMPROT MANUAL SEKARANG
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- FIREBASE SDK V9 -->
+    <!-- FIREBASE & LOGIKA APLIKASI -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
-        // KONFIGURASI FIREBASE ANDA
         const firebaseConfig = {
             apiKey: "AIzaSyAXZE5NAGOogmi00U6A7wJ7qM1ZYVCBH1Q",
             authDomain: "monitoring-pv-7d6ab.firebaseapp.com",
@@ -183,101 +326,136 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        // Referensi Elemen UI
-        const loginScreen = document.getElementById('login-screen');
-        const dashboardScreen = document.getElementById('dashboard-screen');
-        const btnLogin = document.getElementById('btnLogin');
-        const btnLogout = document.getElementById('btnLogout');
-        const pesanError = document.getElementById('pesanError');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.content-section');
+        const headerJudul = document.getElementById('halaman-judul');
+        const btnExcel = document.getElementById('btnExcel');
 
-        // FUNGSI LOGIN
-        btnLogin.addEventListener('click', () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            btnLogin.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
-            
-            signInWithEmailAndPassword(auth, email, password)
-                .catch((error) => {
-                    pesanError.style.display = 'block';
-                    pesanError.innerText = "Gagal masuk: Periksa kembali email & kata sandi Anda.";
-                    btnLogin.innerHTML = 'MASUK';
-                });
-        });
-
-        // FUNGSI LOGOUT
-        btnLogout.addEventListener('click', () => {
-            signOut(auth);
-        });
-
-        let unsubscribeDB = null; 
-
-        // DETEKSI STATUS LOGIN
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User berhasil login
-                loginScreen.style.display = 'none';
-                dashboardScreen.style.display = 'block';
-                btnLogin.innerHTML = 'MASUK'; 
-                mulaiBacaData();
-            } else {
-                // User belum login / terlogout
-                loginScreen.style.display = 'flex';
-                dashboardScreen.style.display = 'none';
-                document.getElementById('email').value = '';
-                document.getElementById('password').value = '';
-                pesanError.style.display = 'none';
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                sections.forEach(sec => sec.style.display = 'none');
                 
-                if (unsubscribeDB) unsubscribeDB(); // Putuskan koneksi database
-            }
+                const targetID = this.getAttribute('data-target');
+                document.getElementById('section-' + targetID).style.display = 'block';
+
+                if(targetID === 'dashboard') { headerJudul.innerText = "Data Monitoring Saat Ini"; btnExcel.style.display = "block"; } 
+                else if(targetID === 'grafik') { headerJudul.innerText = "Grafik Riwayat Real-Time"; btnExcel.style.display = "none"; } 
+                else if(targetID === 'kontrol') { headerJudul.innerText = "Panel Kendali Otomasi"; btnExcel.style.display = "none"; }
+            });
         });
 
-        // KONFIGURASI GRAFIK
-        const batasDataGrafik = 20;
+        document.getElementById('btnLogin').addEventListener('click', () => {
+            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value)
+                .catch(() => { document.getElementById('pesanError').style.display = 'block'; document.getElementById('pesanError').innerText = 'Email/Password Salah!'; });
+        });
+        document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) { document.getElementById('login-screen').style.display = 'none'; document.getElementById('wrapper').style.display = 'flex'; mulaiBacaData(); } 
+            else { document.getElementById('login-screen').style.display = 'flex'; document.getElementById('wrapper').style.display = 'none'; }
+        });
+
+        // HAPUS setInterval jam PC di sini agar web patuh pada RTC ESP32
+
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = "#64748b";
+        
+        const chartOptions = {
+            responsive: true, maintainAspectRatio: false, 
+            plugins: { legend: { display: false } },
+            scales: { x: { grid: { display: false } }, y: { grid: { color: '#f1f5f9' }, beginAtZero: false } },
+            elements: { point: { radius: 2, hoverRadius: 5 } }
+        };
+
         const ctxSuhu = document.getElementById('grafikSuhu').getContext('2d');
-        const chartSuhu = new Chart(ctxSuhu, {
-            type: 'line',
-            data: { labels: [], datasets: [{ label: 'Suhu Panel', data: [], borderColor: '#ff416c', backgroundColor: 'rgba(255, 65, 108, 0.1)', borderWidth: 2, fill: true, tension: 0.4 }] }
+        const chartSuhu = new Chart(ctxSuhu, { 
+            type: 'line', data: { labels: [], datasets: [{ label: 'Suhu', data: [], borderColor: '#e11d48', backgroundColor: 'rgba(225, 29, 72, 0.08)', borderWidth: 2.5, fill: true, tension: 0.4 }] }, options: chartOptions
         });
+        
         const ctxEf = document.getElementById('grafikEfisiensi').getContext('2d');
-        const chartEf = new Chart(ctxEf, {
-            type: 'line',
-            data: { labels: [], datasets: [{ label: 'Efisiensi PV', data: [], borderColor: '#11998e', backgroundColor: 'rgba(17, 153, 142, 0.1)', borderWidth: 2, fill: true, tension: 0.4 }] },
-            options: { scales: { y: { suggestedMin: 0, suggestedMax: 20 } } }
+        const chartEf = new Chart(ctxEf, { 
+            type: 'line', data: { labels: [], datasets: [{ label: 'Efisiensi', data: [], borderColor: '#059669', backgroundColor: 'rgba(5, 150, 105, 0.08)', borderWidth: 2.5, fill: true, tension: 0.4 }] }, options: chartOptions
         });
 
-        // FUNGSI MEMBACA DATABASE REAL-TIME
+        let currentData = {};
         function mulaiBacaData() {
-            const rtdbRef = ref(db, 'Monitoring');
-            
-            unsubscribeDB = onValue(rtdbRef, (snapshot) => {
+            onValue(ref(db, 'Monitoring'), (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    // Update Angka
-                    document.getElementById('suhu').innerText = data.Suhu.toFixed(1) + " °C";
-                    document.getElementById('efisiensi').innerText = data.Efisiensi.toFixed(1) + " %";
-                    document.getElementById('daya').innerText = data.DayaKeluar.toFixed(1) + " W";
-                    document.getElementById('pompa').innerText = data.StatusPompa;
+                    currentData = data;
                     
-                    // Update Info Tambahan
-                    document.getElementById('lux').innerText = Math.round(data.Lux) + " Lux";
-                    document.getElementById('tegangan').innerText = data.Tegangan.toFixed(2) + " V";
-                    document.getElementById('arus').innerText = Math.round(data.Arus) + " mA";
+                    // JAM TER-UPDATE DARI RTC ESP32
+                    document.getElementById('tanggal').innerText = data.Tanggal || '--/--/----';
+                    document.getElementById('jam').innerText = data.Waktu || '--:--:--';
+                    
+                    document.getElementById('suhu').innerText = (data.Suhu || 0).toFixed(1); 
+                    document.getElementById('suhu2').innerText = (data.Suhu || 0).toFixed(1);
+                    document.getElementById('efisiensi').innerText = (data.Efisiensi || 0).toFixed(1); 
+                    document.getElementById('dayaKeluar').innerText = (data.DayaKeluar || 0).toFixed(2);
+                    document.getElementById('dayaKeluar2').innerText = (data.DayaKeluar || 0).toFixed(2);
+                    document.getElementById('dayaMasuk').innerText = (((data.Lux || 0) / 116.0) * 0.1575).toFixed(2);
+                    document.getElementById('tegangan').innerText = (data.Tegangan || 0).toFixed(2); 
+                    document.getElementById('arus').innerText = Math.round(data.Arus || 0);
+                    document.getElementById('lux').innerText = Math.round(data.Lux || 0);
+                    
+                    const pStatus = document.getElementById('statusPompa');
+                    const labelMesin = document.getElementById('labelStatusMesin');
 
-                    // Update Grafik
-                    const waktu = new Date().toLocaleTimeString('id-ID', { hour12: false });
-                    chartSuhu.data.labels.push(waktu);
-                    chartSuhu.data.datasets[0].data.push(data.Suhu);
-                    chartEf.data.labels.push(waktu);
-                    chartEf.data.datasets[0].data.push(data.Efisiensi);
+                    if(data.StatusPompa === "Menyemprot") {
+                        pStatus.innerHTML = '<span class="text-primary fw-bold"><i class="fa-solid fa-droplet me-1"></i> Menyemprot (ON)</span>';
+                        labelMesin.innerHTML = '<span class="text-primary fw-bold"><i class="fa-solid fa-spinner fa-spin me-1"></i> Sedang Menyemprot (5 Detik)</span>';
+                    } else if (data.StatusPompa === "Jeda Mendingin") {
+                        pStatus.innerHTML = '<span class="text-warning fw-bold"><i class="fa-solid fa-hourglass-half me-1"></i> Jeda Mendingin</span>';
+                        labelMesin.innerHTML = '<span class="text-warning fw-bold"><i class="fa-regular fa-clock me-1"></i> Fase Mendingin (Siklus 2 Menit)</span>';
+                    } else {
+                        pStatus.innerHTML = '<span class="text-danger fw-bold"><i class="fa-solid fa-stop me-1"></i> Standby (OFF)</span>';
+                        labelMesin.innerHTML = '<span class="text-success fw-bold"><i class="fa-solid fa-check-circle me-1"></i> Standby (Memantau Suhu)</span>';
+                    }
 
-                    if (chartSuhu.data.labels.length > batasDataGrafik) {
-                        chartSuhu.data.labels.shift(); chartSuhu.data.datasets[0].data.shift();
-                        chartEf.data.labels.shift(); chartEf.data.datasets[0].data.shift();
+                    // TAMPILKAN GRAFIK BERDASARKAN JAM DARI ALAT (Bukan HP)
+                    const waktuGrafik = data.Waktu || new Date().toLocaleTimeString('id-ID', { hour12: false });
+                    chartSuhu.data.labels.push(waktuGrafik); chartSuhu.data.datasets[0].data.push(data.Suhu || 0);
+                    chartEf.data.labels.push(waktuGrafik); chartEf.data.datasets[0].data.push(data.Efisiensi || 0);
+                    
+                    if (chartSuhu.data.labels.length > 20) { 
+                        chartSuhu.data.labels.shift(); chartSuhu.data.datasets[0].data.shift(); 
+                        chartEf.data.labels.shift(); chartEf.data.datasets[0].data.shift(); 
                     }
                     chartSuhu.update(); chartEf.update();
                 }
             });
         }
+
+        document.getElementById('btnTriggerSemprot').addEventListener('click', function() {
+            const btn = this;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Mengirim Sinyal...';
+            btn.style.background = "#64748b";
+            set(ref(db, 'Kontrol/Trigger'), "ON");
+            
+            setTimeout(() => { 
+                btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Sinyal Diterima'; 
+                btn.style.background = "#10b981";
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-solid fa-shower me-2"></i> SEMPROT MANUAL SEKARANG';
+                    btn.style.background = "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)";
+                }, 2000);
+            }, 800);
+        });
+
+        document.getElementById('btnExcel').addEventListener('click', () => {
+            if(!currentData.Suhu) return;
+            
+            // EXCEL SEKARANG MENGGUNAKAN JAM & TGL ASLI DARI RTC
+            let csv = "data:text/csv;charset=utf-8,Tanggal,Waktu,Suhu (C),Lux,Tegangan (V),Arus (mA),Daya Keluar (W),Efisiensi (%),Status Pompa\n";
+            csv += `${currentData.Tanggal},${currentData.Waktu},${currentData.Suhu},${currentData.Lux},${currentData.Tegangan},${currentData.Arus},${currentData.DayaKeluar},${currentData.Efisiensi},${currentData.StatusPompa}\n`;
+            
+            const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv));
+            link.setAttribute("download", `Data_PV_${currentData.Waktu.replace(/:/g,"-")}.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        });
     </script>
 </body>
 </html>
